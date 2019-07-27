@@ -1,14 +1,34 @@
 /* eslint-disable no-console,no-restricted-syntax */
-/* global window, HBInit */
+/* global document, window, HBInit */
 const Server = require('./server');
 
+function setOption(optionName, message) {
+  // eslint-disable-next-line no-alert
+  window.localStorage.setItem(optionName, window.prompt(message));
+}
+
+function registerOptionSetting(name, optionName) {
+  const button = document.createElement('button');
+  button.innerHTML = `Set ${name}`;
+  button.addEventListener('click', () => setOption(optionName, `Provide new ${name}`));
+  document.body.prepend(button);
+}
+
+registerOptionSetting('room password', 'password');
+registerOptionSetting('host player name', 'serverName');
+registerOptionSetting('room name', 'roomName');
+
 window.onHBLoaded = () => {
+  const ROOM_NAME = window.localStorage.getItem('roomName') || 'Headless Server Room';
+  const SERVER_NAME = window.localStorage.getItem('serverName') || 'Server';
+  const PASSWORD = window.localStorage.getItem('password') || undefined;
+
   const room = HBInit({
-    roomName: '',
+    roomName: ROOM_NAME,
     maxPlayers: 100,
     public: false,
-    playerName: '',
-    password: '',
+    playerName: SERVER_NAME,
+    password: PASSWORD,
   });
 
   const server = new Server.Server(room);
