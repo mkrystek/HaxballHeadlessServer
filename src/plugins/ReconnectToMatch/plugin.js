@@ -5,9 +5,9 @@ class ReconnectToMatch {
 
   addPlayerToMatch(player) {
     if (this.server.gameStarted) {
-      if (this.server.redTeam.has(player.name)) {
+      if (this.server.redTeam.has(player.auth)) {
         this.server.room.setPlayerTeam(player.id, 1);
-      } else if (this.server.blueTeam.has(player.name)) {
+      } else if (this.server.blueTeam.has(player.auth)) {
         this.server.room.setPlayerTeam(player.id, 2);
       }
     }

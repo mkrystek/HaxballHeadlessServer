@@ -3,6 +3,7 @@ class Server {
     this.room = room;
     this.redTeam = new Set();
     this.blueTeam = new Set();
+    this.playerAuth = {};
     this.gameStarted = false;
     this.commands = {};
 
@@ -37,7 +38,18 @@ class Server {
 
   get players() {
     return this.room.getPlayerList()
-      .filter(player => player.id !== 0);
+      .map(player => ({
+        ...player,
+        auth: this.playerAuth[player.id],
+      }));
+  }
+
+  rememberPlayerAuth(player) {
+    this.playerAuth[player.id] = player.auth;
+  }
+
+  deletePlayerAuth(player) {
+    delete this.playerAuth[player.id];
   }
 
   setStadium(stadiumName) {
@@ -76,9 +88,9 @@ class Server {
 
       this.room.setPlayerTeam(player.id, team);
       if (team === 1) {
-        this.redTeam.add(player.name);
+        this.redTeam.add(player.auth);
       } else {
-        this.blueTeam.add(player.name);
+        this.blueTeam.add(player.auth);
       }
     });
 
@@ -86,7 +98,7 @@ class Server {
   }
 
   sendChat(message, player) {
-    this.room.sendChat(message, player);
+    this.room.sendAnnouncement(message, player, 0xa11f07, 'italic', 0);
   }
 
   addCommand(plugin, commandName, commandDescriptor) {
@@ -123,7 +135,8 @@ class Server {
 module.exports = {
   Server,
   hooks: {
-    onPlayerLeave: ['stopGameIfTeamIsEmpty'],
+    onPlayerJoin: ['rememberPlayerAuth'],
+    onPlayerLeave: ['stopGameIfTeamIsEmpty', 'deletePlayerAuth'],
     onGameStop: ['stopGame'],
   },
 };

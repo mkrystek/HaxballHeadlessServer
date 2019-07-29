@@ -15,19 +15,17 @@ function registerOptionSetting(name, optionName) {
 }
 
 registerOptionSetting('room password', 'password');
-registerOptionSetting('host player name', 'serverName');
 registerOptionSetting('room name', 'roomName');
 
 window.onHBLoaded = () => {
   const ROOM_NAME = window.localStorage.getItem('roomName') || 'Headless Server Room';
-  const SERVER_NAME = window.localStorage.getItem('serverName') || 'Server';
   const PASSWORD = window.localStorage.getItem('password') || undefined;
 
   const room = HBInit({
     roomName: ROOM_NAME,
     maxPlayers: 100,
     public: false,
-    playerName: SERVER_NAME,
+    noPlayer: true,
     password: PASSWORD,
   });
 
@@ -82,4 +80,5 @@ window.onHBLoaded = () => {
   loadPlugin('Vote');
   loadPlugin('AnnounceWinners');
   loadPlugin('ReconnectToMatch');
+  loadPlugin('StatsGathering');
 };
