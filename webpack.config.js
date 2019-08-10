@@ -18,6 +18,8 @@ module.exports = {
     new WebpackUserscript({
       pretty: false,
       headers: {
+        updateURL: 'https://raw.githubusercontent.com/Xylem/HaxballHeadlessServer/master/dist/main.meta.js',
+        downloadURL: 'https://raw.githubusercontent.com/Xylem/HaxballHeadlessServer/master/dist/main.user.js',
         match: 'https://*.haxball.com/headless',
         name: 'Haxball Headless Server',
         version: dev ? '[version]-build.[buildNo]' : '[version]',

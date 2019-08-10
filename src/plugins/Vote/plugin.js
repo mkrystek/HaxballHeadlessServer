@@ -15,17 +15,12 @@ class VoteManager {
   }
 
   voteEnded() {
-    this.voteInProgress = null;
+    delete this.voteInProgress;
   }
 
   vote(player, action, value) {
     if (this.server.gameStarted) {
       this.server.sendChat('Game is in progress, can\'t vote now!', player.id);
-      return;
-    }
-
-    if (this.voteInProgress) {
-      this.server.sendChat('Another vote is already in progress!', player.id);
       return;
     }
 
@@ -39,7 +34,12 @@ class VoteManager {
       return;
     }
 
-    const { allowedStadiums } = this.server;
+    if (this.voteInProgress) {
+      this.server.sendChat('Another vote is already in progress!', player.id);
+      return;
+    }
+
+    const allowedStadiums = new Set(['Classic', 'Easy', 'Small', 'Big', 'Rounded', 'Hockey', 'Big Hockey', 'Big Easy', 'Big Rounded', 'Huge']);
     let onSuccess;
     let actionDescription;
 

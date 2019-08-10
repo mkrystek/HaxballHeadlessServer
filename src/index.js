@@ -80,5 +80,5 @@ window.onHBLoaded = () => {
   loadPlugin('Vote');
   loadPlugin('AnnounceWinners');
   loadPlugin('ReconnectToMatch');
-  loadPlugin('StatsGathering');
+  // loadPlugin('StatsGathering');
 };

@@ -15,7 +15,7 @@ class Vote {
 
   stopVote() {
     clearTimeout(this.voteTimeout);
-    this.voteManager.voteEnded();
+    setTimeout(() => this.voteManager.voteEnded(), 0);
   }
 
   checkVote() {
@@ -24,11 +24,11 @@ class Vote {
     if (this.votedYes.size > players.length / 2) {
       this.server.sendChat(`Voted to ${this.actionDescription}`);
       this.onSuccess();
+      this.stopVote();
     } else if (this.votedNo.size > players.length / 2) {
       this.server.sendChat(`Voted to not ${this.actionDescription}`);
+      this.stopVote();
     }
-
-    this.stopVote();
   }
 
   writeVoteStats(player) {

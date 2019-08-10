@@ -32,10 +32,6 @@ class Server {
     };
   }
 
-  static get allowedStadiums() {
-    return new Set(['Classic', 'Easy', 'Small', 'Big', 'Rounded', 'Hockey', 'Big Hockey', 'Big Easy', 'Big Rounded', 'Huge']);
-  }
-
   get players() {
     return this.room.getPlayerList()
       .map(player => ({
@@ -98,7 +94,8 @@ class Server {
   }
 
   sendChat(message, player) {
-    this.room.sendAnnouncement(message, player, 0xa11f07, 'italic', 0);
+    const color = '#efc131';
+    this.room.sendAnnouncement(message, player, parseInt(color.slice(1), 16), 'italic', 0);
   }
 
   addCommand(plugin, commandName, commandDescriptor) {
