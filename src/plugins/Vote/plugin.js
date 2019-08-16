@@ -48,7 +48,7 @@ class VoteManager {
         if (!allowedStadiums.has(value)) {
           this.server.sendChat(`Stadium name must be one of ${Array.from(allowedStadiums)
             .join(', ')}!`, player.id);
-          break;
+          return;
         }
 
         actionDescription = `change stadium to ${value}`;
@@ -61,7 +61,7 @@ class VoteManager {
 
         if (Number.isNaN(time) || time < 0) {
           this.server.sendChat('Time must be a non-negative integer!', player.id);
-          break;
+          return;
         }
 
         actionDescription = `change time limit to ${value}`;
@@ -74,7 +74,7 @@ class VoteManager {
 
         if (Number.isNaN(score) || score < 0) {
           this.server.sendChat('Score must be a non-negative integer!', player.id);
-          break;
+          return;
         }
 
         actionDescription = `change score limit to ${value}`;
