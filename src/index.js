@@ -16,6 +16,8 @@ function registerOptionSetting(name, optionName) {
 
 registerOptionSetting('room password', 'password');
 registerOptionSetting('room name', 'roomName');
+registerOptionSetting('stats API address', 'statsAPI');
+registerOptionSetting('stats API key', 'statsAPIKey');
 
 window.onHBLoaded = () => {
   const ROOM_NAME = window.localStorage.getItem('roomName') || 'Headless Server Room';
@@ -80,5 +82,5 @@ window.onHBLoaded = () => {
   loadPlugin('Vote');
   loadPlugin('AnnounceWinners');
   loadPlugin('ReconnectToMatch');
-  // loadPlugin('StatsGathering');
+  loadPlugin('StatsGathering');
 };
