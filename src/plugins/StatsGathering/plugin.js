@@ -11,8 +11,6 @@ class StatsGathering {
     this.startDate = null;
     this.assistKick = {};
     this.lastKick = {};
-    this.goalsRed = 0;
-    this.goalsBlue = 0;
     this.goals = [];
   }
 
@@ -30,14 +28,11 @@ class StatsGathering {
       return;
     }
 
-    if (team === 1) {
-      this.goalsRed += 1;
-    } else {
-      this.goalsBlue += 1;
-    }
+    const scores = this.server.room.getScores();
+    const goalTime = Math.ceil(scores.time);
 
     const goalDescription = {
-      goalDate: new Date().toISOString(),
+      goalTime,
       team: team === 1 ? 'red' : 'blue',
       player: this.lastKick.name,
     };
@@ -54,7 +49,7 @@ class StatsGathering {
     this.lastKick = {};
   }
 
-  sendStats() {
+  sendStats(scores) {
     if (!this.enabled) {
       return;
     }
@@ -65,11 +60,12 @@ class StatsGathering {
     const matchData = {
       startDate: this.startDate,
       endDate: new Date().toISOString(),
+      duration: Math.ceil(scores.time),
       playersRed,
       playersBlue,
       stadium: this.server.stadium,
-      goalsBlue: this.goalsBlue,
-      goalsRed: this.goalsRed,
+      goalsBlue: scores.blue,
+      goalsRed: scores.red,
       goalsDescription: this.goals,
     };
 
