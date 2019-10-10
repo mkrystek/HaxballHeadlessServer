@@ -1,13 +1,12 @@
-/* global window, fetch */
-
 class StatsGathering {
-  constructor(server) {
+  constructor(server, { api }) {
     this.server = server;
+    this.api = api;
     this.clearState();
   }
 
   clearState() {
-    this.enabled = window.localStorage.getItem('statsAPI') !== undefined;
+    this.enabled = this.api.isEnabled();
     this.startDate = null;
     this.assistKick = {};
     this.lastKick = {};
@@ -69,18 +68,7 @@ class StatsGathering {
       goalsDescription: this.goals,
     };
 
-    const headers = window.localStorage.getItem('statsAPIKey') === undefined
-      ? { 'Content-Type': 'application/json' }
-      : { 'Content-Type': 'application/json', 'X-Api-Key': window.localStorage.getItem('statsAPIKey') };
-    fetch(window.localStorage.getItem('statsAPI'), { method: 'POST', headers, body: JSON.stringify(matchData) })
-      .then((res) => {
-        if (res.ok) {
-          this.server.sendChat('Match results sent to stats server');
-        } else {
-          this.server.sendChat(`Unable to send match results to stats server, response: ${res.status}`);
-        }
-      })
-      .catch(e => this.server.sendChat(`Unable to send match results to stats server, reason: ${e.message}`));
+    this.api.sendMatch(matchData);
   }
 
   startGatheringStats() {

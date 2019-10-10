@@ -3,7 +3,8 @@
   "version": "0.10.0",
   "description": "",
   "scripts": {
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "lint": "eslint ."
   },
   "author": "Xylem",
   "license": "MIT",

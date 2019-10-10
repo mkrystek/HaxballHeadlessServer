@@ -1,6 +1,7 @@
 /* eslint-disable no-console,no-restricted-syntax */
 /* global document, window, HBInit */
 const Server = require('./server');
+const Api = require('./api');
 
 function setOption(optionName, message) {
   // eslint-disable-next-line no-alert
@@ -32,6 +33,7 @@ window.onHBLoaded = () => {
   });
 
   const server = new Server.Server(room);
+  const api = new Api(server);
 
   const pluginHooks = {};
 
@@ -62,11 +64,11 @@ window.onHBLoaded = () => {
     }
   }
 
-  function loadPlugin(pluginName) {
+  function loadPlugin(pluginName, additionalArgs = {}) {
     // eslint-disable-next-line global-require,import/no-dynamic-require
     const { plugin: Plugin, hooks, commands } = require(`./plugins/${pluginName}/plugin`);
 
-    const plugin = new Plugin(server);
+    const plugin = new Plugin(server, additionalArgs);
 
     loadHooks(plugin, hooks);
 
@@ -82,5 +84,5 @@ window.onHBLoaded = () => {
   loadPlugin('Vote');
   loadPlugin('AnnounceWinners');
   loadPlugin('ReconnectToMatch');
-  loadPlugin('StatsGathering');
+  loadPlugin('StatsGathering', { api });
 };
