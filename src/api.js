@@ -15,7 +15,7 @@ const getHeaders = (contentType = 'application/json') => {
 class Api {
   constructor(server) {
     this.server = server;
-    this.server.room.onRoomLink = this.sendRoomLink;
+    this.server.room.onRoomLink = this.sendRoomLink.bind(this);
   }
 
   isEnabled() {
