@@ -33,7 +33,7 @@ window.onHBLoaded = () => {
   });
 
   const server = new Server.Server(room);
-  const api = new Api(server);
+  const api = new Api.Api(server);
 
   const pluginHooks = {};
 
@@ -78,6 +78,7 @@ window.onHBLoaded = () => {
   }
 
   loadHooks(server, Server.hooks);
+  loadHooks(api, Api.hooks);
   loadPlugin('Help');
   loadPlugin('ScoreTracking');
   loadPlugin('ReadyPlayers');

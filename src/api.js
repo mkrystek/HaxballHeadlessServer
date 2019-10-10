@@ -15,7 +15,6 @@ const getHeaders = (contentType = 'application/json') => {
 class Api {
   constructor(server) {
     this.server = server;
-    this.server.room.onRoomLink = this.sendRoomLink.bind(this);
   }
 
   isEnabled() {
@@ -65,4 +64,9 @@ class Api {
   }
 }
 
-module.exports = Api;
+module.exports = {
+  Api,
+  hooks: {
+    onRoomLink: ['sendRoomLink'],
+  },
+};
