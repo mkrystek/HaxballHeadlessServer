@@ -26,7 +26,7 @@ class Server {
         return true;
       }
 
-      this.commands[commandName].action(player, ...args);
+      this.commands[commandName].action({ ...player, auth: this.playerAuth[player.id] }, ...args);
 
       return false;
     };

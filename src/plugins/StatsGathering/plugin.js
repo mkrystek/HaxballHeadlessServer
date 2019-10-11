@@ -2,6 +2,7 @@ class StatsGathering {
   constructor(server, { api }) {
     this.server = server;
     this.api = api;
+    this.playerIds = {};
     this.clearState();
   }
 
@@ -53,8 +54,13 @@ class StatsGathering {
       return;
     }
 
-    const playersRed = this.server.players.filter(p => p.team === 1).map(p => p.name);
-    const playersBlue = this.server.players.filter(p => p.team === 2).map(p => p.name);
+    const mapPlayer = p => ({
+      matchName: p.name,
+      playerId: this.playerIds[p.auth],
+    });
+
+    const playersRed = this.server.players.filter(p => p.team === 1).map(mapPlayer);
+    const playersBlue = this.server.players.filter(p => p.team === 2).map(mapPlayer);
 
     const matchData = {
       startDate: this.startDate,
@@ -80,6 +86,52 @@ class StatsGathering {
 
     this.startDate = new Date().toISOString();
   }
+
+  async lookupPlayerData(player) {
+    if (!this.enabled) {
+      return;
+    }
+
+    const playerId = await this.api.lookupPlayer(player);
+
+    if (playerId) {
+      this.playerIds[player.auth] = playerId;
+    }
+  }
+
+  async register(player, login, password) {
+    if (!this.enabled) {
+      return;
+    }
+
+    if (!login || !password) {
+      this.server.sendChat('You have to provide both login and password.', player.id);
+      return;
+    }
+
+    const playerId = await this.api.registerPlayer(player, login, password);
+
+    if (playerId) {
+      this.playerIds[player.auth] = playerId;
+    }
+  }
+
+  async login(player, login, password) {
+    if (!this.enabled) {
+      return;
+    }
+
+    if (!login || !password) {
+      this.server.sendChat('You have to provide both login and password.', player.id);
+      return;
+    }
+
+    const playerId = await this.api.loginPlayer(player, login, password);
+
+    if (playerId) {
+      this.playerIds[player.auth] = playerId;
+    }
+  }
 }
 
 module.exports = {
@@ -89,5 +141,20 @@ module.exports = {
     onPlayerBallKick: ['registerNewKick'],
     onTeamGoal: ['addNewGoal'],
     onTeamVictory: ['sendStats'],
+    onPlayerJoin: ['lookupPlayerData'],
+  },
+  commands: {
+    register: {
+      help: 'register new player',
+      usage: [
+        '!register [login] [password]',
+      ],
+    },
+    login: {
+      help: 'log in existing player',
+      usage: [
+        '!login [login] [password]',
+      ],
+    },
   },
 };
