@@ -86,4 +86,5 @@ window.onHBLoaded = () => {
   loadPlugin('AnnounceWinners');
   loadPlugin('ReconnectToMatch');
   loadPlugin('StatsGathering', { api });
+  loadPlugin('ReplayRecorder', { api });
 };

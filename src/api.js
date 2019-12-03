@@ -138,6 +138,22 @@ class Api {
 
     return null;
   }
+
+  async sendMatchReplay(replayContent) {
+    try {
+      const res = await fetch(getAPIAddress('replays'), {
+        method: 'POST',
+        headers: getHeaders('text/plain'),
+        body: replayContent,
+      });
+
+      if (res.status !== 201) {
+        console.error(`Unable to send match replay (${res.status}), reason: ${await res.text()}`);
+      }
+    } catch (e) {
+      console.error(`Unable to send match replay, reason: ${e.message}`);
+    }
+  }
 }
 
 module.exports = {
