@@ -2,7 +2,7 @@ class StatsGathering {
   constructor(server, { api }) {
     this.server = server;
     this.api = api;
-    this.playerIds = {};
+    this.playerInfos = {};
     this.clearState();
   }
 
@@ -56,7 +56,7 @@ class StatsGathering {
 
     const mapPlayer = p => ({
       matchName: p.name,
-      playerId: this.playerIds[p.auth],
+      playerId: this.playerInfos[p.name] && this.playerInfos[p.name].playerId,
     });
 
     const playersRed = this.server.players.filter(p => p.team === 1).map(mapPlayer);
@@ -92,10 +92,10 @@ class StatsGathering {
       return;
     }
 
-    const playerId = await this.api.lookupPlayer(player);
+    const playerInfo = await this.api.lookupPlayer(player);
 
-    if (playerId) {
-      this.playerIds[player.auth] = playerId;
+    if (playerInfo) {
+      this.playerInfos[player.name] = playerInfo;
     }
   }
 
@@ -109,10 +109,10 @@ class StatsGathering {
       return;
     }
 
-    const playerId = await this.api.registerPlayer(player, login, password);
+    const playerInfo = await this.api.registerPlayer(player, login, password);
 
-    if (playerId) {
-      this.playerIds[player.auth] = playerId;
+    if (playerInfo) {
+      this.playerInfos[player.name] = playerInfo;
     }
   }
 
@@ -126,10 +126,57 @@ class StatsGathering {
       return;
     }
 
-    const playerId = await this.api.loginPlayer(player, login, password);
+    const playerInfo = await this.api.loginPlayer(player, login, password);
 
-    if (playerId) {
-      this.playerIds[player.auth] = playerId;
+    if (playerInfo) {
+      this.playerInfos[player.name] = playerInfo;
+    }
+  }
+
+  whois(player, nick) {
+    if (!this.enabled) {
+      this.server.sendChat('Stats gathering is disabled.', player.id);
+      return;
+    }
+
+    const playersInLobby = this.server.players.map(p => p.name);
+
+    if (playersInLobby.length === 0) {
+      this.server.sendChat('Unable to execute whois command.', player.id);
+      return;
+    }
+
+    if (nick) {
+      if (!playersInLobby.includes(nick)) {
+        this.server.sendChat('Unable to check identity of player not present in lobby.', player.id);
+        return;
+      }
+
+      const playerInfo = this.playerInfos[nick];
+
+      if (playerInfo) {
+        this.server.sendChat(`Player ${nick} is logged in as ${playerInfo.login}.`, player.id);
+        return;
+      }
+
+      this.server.sendChat(`Player ${nick} is not logged in.`, player.id);
+    } else {
+      const infos = playersInLobby.reduce((acc, p) => {
+        const playerInfo = this.playerInfos[p];
+
+        if (playerInfo) {
+          return acc.concat(`Player ${p} is logged in as ${playerInfo.login}.`);
+        }
+
+        return acc;
+      }, []);
+
+      if (infos.length === 0) {
+        this.server.sendChat('No logged in players in lobby.', player.id);
+        return;
+      }
+
+      this.server.sendChat(infos.join('\n'), player.id);
     }
   }
 }
@@ -154,6 +201,13 @@ module.exports = {
       help: 'log in existing player',
       usage: [
         '!login [login] [password]',
+      ],
+    },
+    whois: {
+      help: 'check identity of specific player or all players in the lobby',
+      usage: [
+        '!whois - to see identity of all logged players in lobby',
+        '!whois [nick] - to see identity of specific logged player',
       ],
     },
   },

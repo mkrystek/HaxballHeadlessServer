@@ -74,7 +74,7 @@ class Api {
       if (res.status === 200) {
         const { playerId, login } = await res.json();
         this.server.sendChat(`Welcome back, ${login}! If this is not you, consider logging in or registering.`, player.id);
-        return playerId;
+        return { playerId, login };
       }
       this.server.sendChat('Unable to verify your identity. Consider logging in or registering.', player.id);
     } catch (e) {
@@ -99,7 +99,7 @@ class Api {
       if (res.status === 201) {
         const { playerId } = await res.json();
         this.server.sendChat(`Successfully registered as ${login}.`, player.id);
-        return playerId;
+        return { playerId, login };
       }
 
       const message = res.status === 409
@@ -128,7 +128,7 @@ class Api {
       if (res.status === 200) {
         const { playerId } = await res.json();
         this.server.sendChat(`Welcome back, ${login}!`, player.id);
-        return playerId;
+        return { playerId, login };
       }
 
       this.server.sendChat(`Unable to log in player, response: ${res.status}.`, player.id);
