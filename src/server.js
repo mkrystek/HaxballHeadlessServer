@@ -78,7 +78,11 @@ class Server {
 
     this.gameStarted = true;
 
-    players.sort(() => Math.random() - 0.5);
+    for (let i = players.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [players[i], players[j]] = [players[j], players[i]];
+    }
+
     players.forEach((player, i) => {
       const team = (i % 2) + 1;
 
