@@ -9,6 +9,7 @@ class StatsGathering {
   clearState() {
     this.enabled = this.api.isEnabled();
     this.startDate = null;
+    this.originalPlayers = [];
     this.assistKick = {};
     this.lastKick = {};
     this.goals = [];
@@ -59,8 +60,8 @@ class StatsGathering {
       playerId: this.playerInfos[p.name] && this.playerInfos[p.name].playerId,
     });
 
-    const playersRed = this.server.players.filter(p => p.team === 1).map(mapPlayer);
-    const playersBlue = this.server.players.filter(p => p.team === 2).map(mapPlayer);
+    const playersRed = this.originalPlayers.filter(p => p.team === 1).map(mapPlayer);
+    const playersBlue = this.originalPlayers.filter(p => p.team === 2).map(mapPlayer);
 
     const matchData = {
       startDate: this.startDate,
@@ -85,6 +86,7 @@ class StatsGathering {
     }
 
     this.startDate = new Date().toISOString();
+    this.originalPlayers = this.server.players;
   }
 
   async lookupPlayerData(player) {
