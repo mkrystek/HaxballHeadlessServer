@@ -1,3 +1,8 @@
+/* global window */
+
+const loadSetting = key => window.localStorage.getItem(key);
+const saveSetting = (key, value) => window.localStorage.setItem(key, value);
+
 class Server {
   constructor(room) {
     this.room = room;
@@ -7,9 +12,9 @@ class Server {
     this.gameStarted = false;
     this.commands = {};
 
-    this.setStadium('Huge');
-    this.setScoreLimit(3);
-    this.setTimeLimit(5);
+    this.setStadium(loadSetting('stadium') || 'Huge');
+    this.setScoreLimit(loadSetting('scoreLimit') || 3);
+    this.setTimeLimit(loadSetting('timeLimit') || 5);
     this.room.setTeamsLock(true);
 
     this.room.onPlayerChat = (player, message) => {
@@ -53,6 +58,7 @@ class Server {
 
     this.stadium = stadiumName;
     this.room.setDefaultStadium(stadiumName);
+    saveSetting('stadium', stadiumName);
   }
 
   setTimeLimit(timeLimit) {
@@ -60,6 +66,7 @@ class Server {
 
     this.timeLimit = timeLimit;
     this.room.setTimeLimit(timeLimit);
+    saveSetting('timeLimit', timeLimit);
   }
 
   setScoreLimit(scoreLimit) {
@@ -67,6 +74,7 @@ class Server {
 
     this.scoreLimit = scoreLimit;
     this.room.setScoreLimit(scoreLimit);
+    saveSetting('scoreLimit', scoreLimit);
   }
 
   startGame() {
