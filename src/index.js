@@ -20,17 +20,25 @@ registerOptionSetting('room name', 'roomName');
 registerOptionSetting('stats API address', 'statsAPI');
 registerOptionSetting('stats API key', 'statsAPIKey');
 
-window.onHBLoaded = () => {
-  const ROOM_NAME = window.localStorage.getItem('roomName') || 'Headless Server Room';
-  const PASSWORD = window.localStorage.getItem('password') || undefined;
-
-  const room = HBInit({
-    roomName: ROOM_NAME,
+async function createRoomInstance(roomName, password) {
+  const token = await Api.getRoomToken();
+  const roomConfiguration = {
+    roomName,
     maxPlayers: 100,
     public: false,
     noPlayer: true,
-    password: PASSWORD,
-  });
+    password,
+    token,
+  };
+
+  return HBInit(roomConfiguration);
+}
+
+window.onHBLoaded = async () => {
+  const ROOM_NAME = window.localStorage.getItem('roomName') || 'Headless Server Room';
+  const PASSWORD = window.localStorage.getItem('password') || undefined;
+
+  const room = await createRoomInstance(ROOM_NAME, PASSWORD);
 
   const server = new Server.Server(room);
   const api = new Api.Api(server);

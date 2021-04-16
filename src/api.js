@@ -6,6 +6,8 @@ const getAPIKey = () => window.localStorage.getItem('statsAPIKey');
 
 const getAPIAddress = path => `${getAPIBaseAddress()}/${path}`;
 
+const isAPIAvailable = () => getAPIBaseAddress() !== null;
+
 const getHeaders = (contentType = 'application/json') => {
   if (getAPIKey() === undefined) {
     return { 'Content-Type': contentType };
@@ -14,13 +16,34 @@ const getHeaders = (contentType = 'application/json') => {
   return { 'Content-Type': contentType, 'X-Api-Key': getAPIKey() };
 };
 
+const getRoomToken = async () => {
+  if (!isAPIAvailable()) {
+    return null;
+  }
+
+  try {
+    const res = await fetch(getAPIAddress('room/token'), {
+      method: 'GET',
+      headers: getHeaders(),
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    return await res.text();
+  } catch (e) {
+    return null;
+  }
+};
+
 class Api {
   constructor(server) {
     this.server = server;
   }
 
   isEnabled() {
-    return getAPIBaseAddress() !== undefined;
+    return isAPIAvailable();
   }
 
   async sendRoomLink(link) {
@@ -161,4 +184,5 @@ module.exports = {
   hooks: {
     onRoomLink: ['sendRoomLink'],
   },
+  getRoomToken,
 };
