@@ -4,6 +4,7 @@ class StatsGathering {
     this.api = api;
     this.playerInfos = {};
     this.clearState();
+    window.getPlayerInfos = () => this.playerInfos;
   }
 
   clearState() {
@@ -24,6 +25,13 @@ class StatsGathering {
     this.lastKick = player;
   }
 
+  mapPlayer(p) {
+    return {
+      matchName: p.name,
+      playerId: this.playerInfos[p.name] && this.playerInfos[p.name].playerId,
+    };
+  }
+
   addNewGoal(team) {
     if (!this.enabled) {
       return;
@@ -35,13 +43,13 @@ class StatsGathering {
     const goalDescription = {
       goalTime,
       team: team === 1 ? 'red' : 'blue',
-      player: this.lastKick.name,
+      player: this.mapPlayer(this.lastKick),
     };
 
     if (this.lastKick.team !== team) {
       goalDescription.own = true;
     } else if (this.assistKick.id !== this.lastKick.id && this.assistKick.team === team) {
-      goalDescription.assist = this.assistKick.name;
+      goalDescription.assist = this.mapPlayer(this.assistKick);
     }
 
     this.goals.push(goalDescription);
@@ -55,13 +63,8 @@ class StatsGathering {
       return;
     }
 
-    const mapPlayer = p => ({
-      matchName: p.name,
-      playerId: this.playerInfos[p.name] && this.playerInfos[p.name].playerId,
-    });
-
-    const playersRed = this.originalPlayers.filter(p => p.team === 1).map(mapPlayer);
-    const playersBlue = this.originalPlayers.filter(p => p.team === 2).map(mapPlayer);
+    const playersRed = this.originalPlayers.filter(p => p.team === 1).map(p => this.mapPlayer(p));
+    const playersBlue = this.originalPlayers.filter(p => p.team === 2).map(p => this.mapPlayer(p));
 
     const matchData = {
       startDate: this.startDate,
@@ -75,7 +78,8 @@ class StatsGathering {
       goalsDescription: this.goals,
     };
 
-    this.api.sendMatch(matchData);
+    // this.api.sendMatch(matchData);
+    console.log(matchData);
   }
 
   startGatheringStats() {
@@ -89,8 +93,23 @@ class StatsGathering {
     this.originalPlayers = this.server.players;
   }
 
+  isPlayerNickUnique(player) {
+    const playersWithSameNick = this.server.players.filter(p => p.name === player.name);
+
+    if (playersWithSameNick.length > 1) {
+      this.server.sendChat('Unable to track your stats, you need to change your nick', player.id);
+      return false;
+    }
+
+    return true;
+  }
+
   async lookupPlayerData(player) {
     if (!this.enabled) {
+      return;
+    }
+
+    if (!this.isPlayerNickUnique(player)) {
       return;
     }
 
@@ -103,6 +122,10 @@ class StatsGathering {
 
   async register(player, login, password) {
     if (!this.enabled) {
+      return;
+    }
+
+    if (!this.isPlayerNickUnique(player)) {
       return;
     }
 
@@ -120,6 +143,10 @@ class StatsGathering {
 
   async login(player, login, password) {
     if (!this.enabled) {
+      return;
+    }
+
+    if (!this.isPlayerNickUnique(player)) {
       return;
     }
 

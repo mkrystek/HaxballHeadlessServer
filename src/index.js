@@ -94,5 +94,5 @@ window.onHBLoaded = async () => {
   loadPlugin('AnnounceWinners');
   loadPlugin('ReconnectToMatch');
   loadPlugin('StatsGathering', { api });
-  loadPlugin('ReplayRecorder', { api });
+  // loadPlugin('ReplayRecorder', { api });
 };
